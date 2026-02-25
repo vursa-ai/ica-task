@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: interview-postgres
+    environment:
+      POSTGRES_USER: interview_user
+      POSTGRES_PASSWORD: interview_pass
+      POSTGRES_DB: interview_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U interview_user -d interview_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend-python:
+    build: ./backend-python
+    container_name: interview-python
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://interview_user:interview_pass@postgres:5432/interview_db
+    volumes:
+      - ./backend-python:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: uvicorn app:app --host=0.0.0.0 --port=5000 --reload
+
+  frontend:
+    build: ./frontend
+    container_name: interview-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_EXPRESS_API: http://localhost:5000
+      REACT_APP_PYTHON_API: http://localhost:5000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend-python
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:

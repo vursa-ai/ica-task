@@ -1,0 +1,37 @@
+# Node modules
+frontend/node_modules/
+backend-express/node_modules/
+
+# Python
+backend-python/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Build outputs
+frontend/build/
+*.egg-info/
+
+# Docker volumes
+postgres_data/
