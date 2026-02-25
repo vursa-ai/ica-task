@@ -1,95 +1,58 @@
-# Interview Task Backlog (JIRA-Style)
+# Interview Task Backlog
 
-Use these tickets as guided debugging prompts. They are intentionally scoped and do not include full solutions.
+Use these tickets as guided debugging prompts.
 
 ## Board Snapshot
 
 | Ticket | Type | Priority | Area | Summary | Status |
 |---|---|---|---|---|---|
-| INT-101 | Bug | P1 | API Contract | Users list fails to load | OPEN |
-| INT-102 | Bug | P1 | Frontend Cache | Stats/analytics stale after mutations | OPEN |
-| INT-103 | Bug | P2 | React Rendering | Notes move to wrong task after delete | OPEN |
-| INT-104 | Bug | P2 | React Hooks | Auto-refresh invalidates wrong user tasks | OPEN |
-| INT-105 | Bug | P1 | Backend Security | Task query uses unsafe SQL construction | OPEN |
-| INT-106 | Bug | P1 | Backend Data | Delete endpoint reports success but data persists | OPEN |
-| INT-107 | Bug | P2 | Search | Partial search does not return matches | OPEN |
-| INT-108 | Bug | P3 | Analytics | Completion percentage appears too low | OPEN |
-| INT-109 | Bug | P2 | Backend Performance | Task listing endpoint issues repeated DB queries | OPEN |
+| INT-101 | Bug | P1 | Express | Users list fails to load | OPEN |
+| INT-102 | Bug | P1 | Express | Delete endpoint doesn't persist | OPEN |
+| INT-103 | Bug | P1 | Express | Task query is unsafe | OPEN |
+| INT-104 | Bug | P1 | Frontend | Stats and analytics lag behind task changes | OPEN |
+| INT-105 | Bug | P2 | Frontend | Notes drift to wrong task | OPEN |
+| INT-106 | Bug | P2 | Frontend | Auto-refresh targets stale data | OPEN |
+| INT-107 | Bug | P2 | Frontend | Status toggle feels unresponsive | OPEN |
+| INT-108 | Bug | P3 | Frontend | Completion percentage is wrong | OPEN |
 
 ---
 
-## INT-101 - Users list fails to load
-- Type: `Bug`
-- Priority: `P1`
-- Area: `API Contract`
-- Symptoms:
-  - App shows user-load failure state.
-  - Network request for users returns 404.
-- Done when:
-  - Users dropdown loads successfully from backend.
+## INT-101 — Users list fails to load
+- **Type:** Bug | **Priority:** P1
+- **Symptoms:** App shows failure state on startup. Check the network tab.
+- **Done when:** Users dropdown populates correctly.
 
-## INT-102 - Stats/analytics stale after mutations
-- Type: `Bug`
-- Priority: `P1`
-- Area: `Frontend Cache`
-- Symptoms:
-  - Task row updates/deletes appear, but summary cards lag behind.
-- Done when:
-  - Task list, stats, and analytics update consistently after status changes/deletes.
+## INT-102 — Delete endpoint doesn't persist
+- **Type:** Bug | **Priority:** P1
+- **Symptoms:** Deleting a task appears to succeed, but the task reappears on refresh.
+- **Done when:** Deleted tasks stay deleted.
 
-## INT-103 - Notes move to wrong task after delete
-- Type: `Bug`
-- Priority: `P2`
-- Area: `React Rendering`
-- Symptoms:
-  - Local note input appears to jump to a different task after list reorder/delete.
-- Done when:
-  - Notes remain attached to the same logical task after deletes.
+## INT-103 — Task query is unsafe
+- **Type:** Bug | **Priority:** P1
+- **Symptoms:** Review how the task listing query is constructed.
+- **Done when:** Query parameters are handled safely.
 
-## INT-104 - Auto-refresh invalidates wrong user tasks
-- Type: `Bug`
-- Priority: `P2`
-- Area: `React Hooks`
-- Symptoms:
-  - After switching user, timed refresh still targets prior user.
-- Done when:
-  - Auto-refresh always targets currently selected user.
+## INT-104 — Stats and analytics lag behind task changes
+- **Type:** Bug | **Priority:** P1
+- **Symptoms:** After toggling a task's status or deleting a task, the stat cards and analytics section still show old values.
+- **Done when:** All data sections update after any mutation.
 
-## INT-105 - Task query uses unsafe SQL construction
-- Type: `Bug`
-- Priority: `P1`
-- Area: `Backend Security`
+## INT-105 — Notes drift to wrong task
+- **Type:** Bug | **Priority:** P2
+- **Symptoms:** Type a note on a task, then delete a task above it in the list.
+- **Done when:** Notes stay with the task you typed them on.
 
-## INT-106 - Delete reports success but data persists
-- Type: `Bug`
-- Priority: `P1`
-- Area: `Backend Data`
-- Symptoms:
-  - API returns success; record may still exist on subsequent fetch.
-- Done when:
-  - Delete is durable and response matches actual DB outcome.
+## INT-106 — Auto-refresh targets stale data
+- **Type:** Bug | **Priority:** P2
+- **Symptoms:** Switch users and watch the console over time.
+- **Done when:** Auto-refresh always reflects the current selection.
 
-## INT-107 - Partial search does not return matches
-- Type: `Bug`
-- Priority: `P2`
-- Area: `Search`
-- Symptoms:
-  - Search behaves like exact match.
-- Done when:
-  - Partial terms match title/description as expected.
+## INT-107 — Status toggle feels unresponsive
+- **Type:** Bug | **Priority:** P2
+- **Symptoms:** Clicking "Complete" or "Reopen" doesn't update the UI until the server responds. The optimistic update appears to have no effect.
+- **Done when:** The task status updates in the UI immediately on click, before the server round-trip.
 
-## INT-108 - Completion percentage appears too low
-- Type: `Bug`
-- Priority: `P3`
-- Area: `Analytics`
-- Symptoms:
-  - Completion rate display looks scaled down.
-- Done when:
-  - Completion rate aligns with completed/total task ratio.
-
-## INT-109 - Task listing endpoint issues slow
-- Type: `Bug`
-- Priority: `P2`
-- Area: `Backend Performance`
-- Symptoms:
-  - Endpoint performs slow
+## INT-108 — Completion percentage is wrong
+- **Type:** Bug | **Priority:** P3
+- **Symptoms:** The analytics completion rate doesn't match what you'd expect from the task counts.
+- **Done when:** The displayed percentage is correct.

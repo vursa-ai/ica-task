@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import './App.css';
 
-const EXPRESS_API = process.env.REACT_APP_EXPRESS_API || 'http://localhost:5000';
+const EXPRESS_API = process.env.REACT_APP_EXPRESS_API || 'http://localhost:3001';
 const PYTHON_API = process.env.REACT_APP_PYTHON_API || 'http://localhost:5000';
 
 function App() {
@@ -73,10 +73,21 @@ function App() {
     mutationFn: async ({ taskId, status }) => {
       await axios.patch(`${EXPRESS_API}/api/tasks/${taskId}/status`, { status });
     },
-    onSuccess: () => {
+    onMutate: async ({ taskId, status }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks'] });
+      const previousTasks = queryClient.getQueryData(['tasks']);
+      queryClient.setQueryData(['tasks'], (old) =>
+        old?.map(task =>
+          task.id === taskId ? { ...task, status } : task
+        )
+      );
+      return { previousTasks };
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['tasks'], context.previousTasks);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });
 
@@ -86,8 +97,6 @@ function App() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });
 

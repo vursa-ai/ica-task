@@ -35,3 +35,6 @@ frontend/build/
 
 # Docker volumes
 postgres_data/
+
+# Interview solution guide (internal only)
+SOLUTION_GUIDE.md

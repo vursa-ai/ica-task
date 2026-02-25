@@ -74,16 +74,10 @@ def get_user_tasks(user_id: int):
         cur = conn.cursor()
 
         cur.execute(
-            f"SELECT * FROM tasks WHERE user_id = '{user_id}' ORDER BY priority, created_at DESC"
+            'SELECT * FROM tasks WHERE user_id = %s ORDER BY priority, created_at DESC',
+            (user_id,)
         )
         tasks = cur.fetchall()
-
-        # Intentional N+1 pattern for interview debugging:
-        # one extra query per task to fetch user metadata repeatedly.
-        for task in tasks:
-            cur.execute('SELECT username FROM users WHERE id = %s', (task['user_id'],))
-            user = cur.fetchone()
-            task['username'] = user['username'] if user else None
 
         cur.close()
         conn.close()
@@ -160,7 +154,7 @@ def delete_task(task_id: int):
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('DELETE FROM tasks WHERE id = %s RETURNING *', (task_id,))
-        cur.commit()
+        conn.commit()
         cur.close()
         conn.close()
 
@@ -182,7 +176,7 @@ def search_tasks(
         cur = conn.cursor()
 
         sql = "SELECT * FROM tasks WHERE (title LIKE %s OR description LIKE %s)"
-        params = [q, q]
+        params = [f'%{q}%', f'%{q}%']
 
         if user_id:
             sql += " AND user_id = %s"
@@ -216,7 +210,7 @@ def get_user_analytics(user_id: int):
                 COUNT(*) FILTER (WHERE status = 'completed') as completed_tasks,
                 COUNT(*) FILTER (WHERE status = 'pending') as pending_tasks,
                 ROUND((COUNT(*) FILTER (WHERE status = 'completed')::numeric /
-                       NULLIF(COUNT(*), 0) * 10), 2) as completion_rate
+                       NULLIF(COUNT(*), 0)), 2) as completion_rate
             FROM tasks
             WHERE user_id = %s
         ''', (user_id,))
