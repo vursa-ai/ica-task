@@ -18,15 +18,6 @@ CREATE TABLE tasks (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create task_stats table for caching
-CREATE TABLE task_stats (
-    user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    total_tasks INTEGER DEFAULT 0,
-    completed_tasks INTEGER DEFAULT 0,
-    pending_tasks INTEGER DEFAULT 0,
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Insert sample users
 INSERT INTO users (username, email) VALUES
     ('john_doe', 'john@example.com'),
@@ -59,13 +50,3 @@ INSERT INTO tasks (user_id, title, description, status, priority) VALUES
     (3, 'Infrastructure review', 'Evaluate AWS costs and optimize', 'pending', 2),
     (3, 'Update dependencies', 'Upgrade React and related packages', 'pending', 2),
     (3, 'Write technical spec', 'Document the new notification system', 'pending', 1);
-
--- Initialize task stats
-INSERT INTO task_stats (user_id, total_tasks, completed_tasks, pending_tasks)
-SELECT
-    user_id,
-    COUNT(*) as total_tasks,
-    COUNT(*) FILTER (WHERE status = 'completed') as completed_tasks,
-    COUNT(*) FILTER (WHERE status = 'pending') as pending_tasks
-FROM tasks
-GROUP BY user_id;

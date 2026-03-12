@@ -19,6 +19,21 @@ services:
       timeout: 5s
       retries: 5
 
+  backend-express:
+    build: ./backend-express
+    container_name: interview-express
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://interview_user:interview_pass@postgres:5432/interview_db
+    volumes:
+      - ./backend-express:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run dev
+
   backend-python:
     build: ./backend-python
     container_name: interview-python
@@ -39,12 +54,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_EXPRESS_API: http://localhost:5000
+      REACT_APP_EXPRESS_API: http://localhost:3001
       REACT_APP_PYTHON_API: http://localhost:5000
     volumes:
       - ./frontend:/app
       - /app/node_modules
     depends_on:
+      - backend-express
       - backend-python
     stdin_open: true
     tty: true

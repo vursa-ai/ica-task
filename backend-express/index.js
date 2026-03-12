@@ -90,13 +90,13 @@ app.get('/api/users/:id/stats', async (req, res) => {
     console.log(`Fetching stats for user ${id}`);
 
     const result = await pool.query(
-      'SELECT total_tasks, completed_tasks, pending_tasks FROM task_stats WHERE user_id = $1',
+      `SELECT
+        COUNT(*) as total_tasks,
+        COUNT(*) FILTER (WHERE status = 'completed') as completed_tasks,
+        COUNT(*) FILTER (WHERE status = 'pending') as pending_tasks
+      FROM tasks WHERE user_id = $1`,
       [id]
     );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User stats not found' });
-    }
 
     res.json(result.rows[0]);
   } catch (error) {
